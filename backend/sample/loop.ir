@@ -1,0 +1,138 @@
+MethodFragment {
+   X86_64Frame { label = Test_do
+      nextLocalOffset = -8
+      formals = List {
+         t2556
+      }
+   }
+   List {
+      LABEL L_1071
+      MOVE(
+         t2559 <-
+         %rbx:%rbx)
+      MOVE(
+         t2560 <-
+         %r12:%r12)
+      MOVE(
+         t2561 <-
+         %r13:%r13)
+      MOVE(
+         t2562 <-
+         %r14:%r14)
+      MOVE(
+         t2563 <-
+         %r15:%r15)
+      MOVE(
+         t2556 <-
+         %rdi:%rdi)
+      MOVE(
+         t2557 <-
+         CONST 0)
+      LABEL looptest_1066
+      CJUMP(GE,
+         t2557,
+         CONST 10,
+         loopend_1064, loopbody_1065)
+      LABEL loopbody_1065
+      MOVE(
+         t2558 <-
+         CONST 0)
+      LABEL looptest_1069
+      CJUMP(GE,
+         t2558,
+         CONST 10,
+         loopend_1067, loopbody_1068)
+      LABEL loopbody_1068
+      MOVE(
+         t2558 <-
+         BINOP(PLUS,
+            t2558, 
+            CONST 1))
+      JUMP(NAME(looptest_1069))
+      LABEL loopend_1067
+      MOVE(
+         t2557 <-
+         BINOP(PLUS,
+            t2557, 
+            CONST 1))
+      JUMP(NAME(looptest_1066))
+      LABEL loopend_1064
+      MOVE(
+         %rax:%rax <-
+         BINOP(MUL,
+            t2557, 
+            t2558))
+      LABEL bail_1063
+      MOVE(
+         %rbx:%rbx <-
+         t2559)
+      MOVE(
+         %r12:%r12 <-
+         t2560)
+      MOVE(
+         %r13:%r13 <-
+         t2561)
+      MOVE(
+         %r14:%r14 <-
+         t2562)
+      MOVE(
+         %r15:%r15 <-
+         t2563)
+      LABEL DONE_1072
+   }
+}
+MethodFragment {
+   X86_64Frame { label = cs411main
+      nextLocalOffset = -8
+      formals = List {
+      }
+   }
+   List {
+      LABEL L_1073
+      MOVE(
+         t2564 <-
+         %rbx:%rbx)
+      MOVE(
+         t2565 <-
+         %r12:%r12)
+      MOVE(
+         t2566 <-
+         %r13:%r13)
+      MOVE(
+         t2567 <-
+         %r14:%r14)
+      MOVE(
+         t2568 <-
+         %r15:%r15)
+      MOVE(
+         t2570 <-
+         CALL(
+            NAME(cs411newobject),
+            CONST 0))
+      MOVE(
+         t2569 <-
+         CALL(
+            NAME(Test_do),
+            t2570))
+      EXP(CALL(
+         NAME(cs411println),
+         t2569))
+      LABEL bail_1070
+      MOVE(
+         %rbx:%rbx <-
+         t2564)
+      MOVE(
+         %r12:%r12 <-
+         t2565)
+      MOVE(
+         %r13:%r13 <-
+         t2566)
+      MOVE(
+         %r14:%r14 <-
+         t2567)
+      MOVE(
+         %r15:%r15 <-
+         t2568)
+      LABEL DONE_1074
+   }
+}

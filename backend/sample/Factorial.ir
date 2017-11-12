@@ -1,0 +1,137 @@
+MethodFragment {
+   X86_64Frame { label = Fac_ComputeFac
+      nextLocalOffset = -8
+      formals = List {
+         t1888
+         t1889
+      }
+   }
+   List {
+      LABEL L_798
+      MOVE(
+         t1891 <-
+         %rbx:%rbx)
+      MOVE(
+         t1892 <-
+         %r12:%r12)
+      MOVE(
+         t1893 <-
+         %r13:%r13)
+      MOVE(
+         t1894 <-
+         %r14:%r14)
+      MOVE(
+         t1895 <-
+         %r15:%r15)
+      MOVE(
+         t1888 <-
+         %rdi:%rdi)
+      MOVE(
+         t1889 <-
+         %rsi:%rsi)
+      CJUMP(GE,
+         t1889,
+         CONST 1,
+         iffalse_795, iftrue_794)
+      LABEL iftrue_794
+      MOVE(
+         t1890 <-
+         CONST 1)
+      LABEL endif_796
+      MOVE(
+         %rax:%rax <-
+         t1890)
+      LABEL bail_793
+      MOVE(
+         %rbx:%rbx <-
+         t1891)
+      MOVE(
+         %r12:%r12 <-
+         t1892)
+      MOVE(
+         %r13:%r13 <-
+         t1893)
+      MOVE(
+         %r14:%r14 <-
+         t1894)
+      MOVE(
+         %r15:%r15 <-
+         t1895)
+      JUMP(NAME(DONE_799))
+      LABEL iffalse_795
+      MOVE(
+         t1902 <-
+         t1889)
+      MOVE(
+         t1901 <-
+         CALL(
+            NAME(Fac_ComputeFac),
+            t1888,
+            BINOP(MINUS,
+               t1889, 
+               CONST 1)))
+      MOVE(
+         t1890 <-
+         BINOP(MUL,
+            t1902, 
+            t1901))
+      JUMP(NAME(endif_796))
+      LABEL DONE_799
+   }
+}
+MethodFragment {
+   X86_64Frame { label = cs411main
+      nextLocalOffset = -8
+      formals = List {
+      }
+   }
+   List {
+      LABEL L_800
+      MOVE(
+         t1896 <-
+         %rbx:%rbx)
+      MOVE(
+         t1897 <-
+         %r12:%r12)
+      MOVE(
+         t1898 <-
+         %r13:%r13)
+      MOVE(
+         t1899 <-
+         %r14:%r14)
+      MOVE(
+         t1900 <-
+         %r15:%r15)
+      MOVE(
+         t1904 <-
+         CALL(
+            NAME(cs411newobject),
+            CONST 0))
+      MOVE(
+         t1903 <-
+         CALL(
+            NAME(Fac_ComputeFac),
+            t1904,
+            CONST 10))
+      EXP(CALL(
+         NAME(cs411println),
+         t1903))
+      LABEL bail_797
+      MOVE(
+         %rbx:%rbx <-
+         t1896)
+      MOVE(
+         %r12:%r12 <-
+         t1897)
+      MOVE(
+         %r13:%r13 <-
+         t1898)
+      MOVE(
+         %r14:%r14 <-
+         t1899)
+      MOVE(
+         %r15:%r15 <-
+         t1900)
+      LABEL DONE_801
+   }
+}

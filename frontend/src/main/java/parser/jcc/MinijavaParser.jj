@@ -1,0 +1,418 @@
+/**
+ * JavaCC file
+ */
+
+options {
+  JDK_VERSION = "1.6";
+  STATIC = false;
+}
+PARSER_BEGIN(JCCMinijavaParser)
+package parser.jcc;
+
+import ast.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JCCMinijavaParser {
+}
+
+PARSER_END(JCCMinijavaParser)
+
+SKIP :
+{
+ 	" "
+|	"\r"
+|	"\t"
+|	"\n"
+|	< MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/" >
+|   < SINGLE_LINE_COMMENT: "//" (~["\n"])* >
+|   < #NOT_STAR_SLASH: ~["*"] | "*" ~["/"] >
+}
+
+TOKEN : /* KEYWORDS */
+{
+	< PRINT:		"print1" >
+|	< RETURN: 		"return" >
+| 	< INT:			"int" >
+| 	< BOOLEAN: 		"boolean" >
+|   <CLASS:          "class">
+|   <PUBLIC:         "public">
+|   <STATIC:         "static">
+|   <VOID:           "void">
+|   <MAIN:           "main">
+|   <STRING:         "String">
+|   <EXTENDS:        "extends">
+|   <IF:            "if">
+|   <ELSE:          "else">
+|   <WHILE:         "while">
+|   <LENGTH:        "length">
+|   <TRUE:          "true">
+|   <FALSE:         "false">
+|   <NEW:           "new">
+|   <SYSTEM:        "System">
+|   <OUT:           "out">
+|   <PRINTLN:         "println">
+|   <THIS:          "this">
+}
+TOKEN : /* SEPARATORS and OPERATORS*/
+{	<LPAREN: "(">
+|	<RPAREN: ")">
+|	<LBRACE: "{">
+|	<RBRACE: "}">
+|   <LBRACKET: "[">
+|   <RBRACKET: "]">
+|	<ASSIGN: "=">
+|	<QUESTION:	 "?">
+|	<PLUS:	 "+" >
+|	<MINUS:  "-" >
+|	<MULT:   "*" >
+|	<SMALLER:"<">
+|	<NOT:	 "!">
+| 	<COLON:	 ":" >
+| 	<COMMA:	"," >
+| 	<SEMICOLON:	 ";" >
+|   <DOT:    ".">
+|   <AND:   "&&">
+}
+
+TOKEN :
+{   < INTEGER_LITERAL: ( <DIGIT> )+ >
+|   < IDENTIFIER: <LETTER> (<LETTER> | "_" | <DIGIT>)* >
+|   < #LETTER: ["A" - "Z", "a" - "z"] >
+|   < #DIGIT: ["0" - "9"] >
+}
+
+
+//Goal	::=	MainClass ( ClassDeclaration )* <EOF>
+Program Goal() : {
+    MainClass main;
+	NodeList<ClassDecl> classes = new NodeList<ClassDecl>();
+	ClassDecl c;
+}
+{
+    main=MainClass()
+	( c=ClassDeclaration()
+		{ classes.add(c); }
+	)*
+	<EOF>
+	{ return new Program(main, classes); }
+}
+
+// MainClass
+//MainClass	::=	"class" Identifier "{" "public" "static" "void" "main" "(" "String" "[" "]"
+//Identifier ")" "{" Statement "}" "}"
+MainClass MainClass() : {
+    String className;
+    String argName;
+    Statement s;
+}
+{
+    <CLASS>
+    className=Identifier()
+    <LBRACE> <PUBLIC> <STATIC> <VOID> <MAIN>
+        <LPAREN>
+            <STRING> <LBRACKET> <RBRACKET> argName=Identifier()
+        <RPAREN>
+        <LBRACE> s=Statement()
+        <RBRACE>
+    <RBRACE>
+    { return new MainClass(className,argName,s);}
+}
+
+// ClassDeclaration
+//ClassDeclaration	::=	"class" Identifier ( "extends" Identifier )?
+//"{" ( VarDeclaration )* ( MethodDeclaration )* "}"
+ClassDecl ClassDeclaration() : {
+    String name;
+    String superName = null;
+    NodeList<VarDecl> vars = new NodeList<VarDecl>();
+    NodeList<MethodDecl> methods = new NodeList<MethodDecl>();
+    VarDecl v;
+    MethodDecl m;
+}
+{
+    <CLASS> name=Identifier()
+    ( <EXTENDS> superName=Identifier() )?
+    <LBRACE> ( v=VarDeclaration() { vars.add(v);} )*
+              ( m=MethodDeclaration() {methods.add(m);} )*
+    <RBRACE>
+    {return new ClassDecl(name,superName, vars,methods);}
+}
+
+// VarDeclaration
+//VarDeclaration	::=	Type Identifier ";"
+VarDecl VarDeclaration() : {
+    Type t;
+    String name;
+}
+{
+    t=Type()
+    name=Identifier()
+    <SEMICOLON>
+    {return new VarDecl(ast.VarDecl.Kind.FIELD,t,name,0);}
+}
+// MethodDeclaration
+//MethodDeclaration	::=	"public" Type Identifier "(" ( Type Identifier ( "," Type Identifier )* )? ")"
+//"{" ( VarDeclaration )* ( Statement )* "return" Expression ";" "}"
+MethodDecl MethodDeclaration() : {
+    Type returnType,t;
+    String name,id;
+    List<VarDecl> formals;
+    NodeList<VarDecl> formalsAsNodeList;
+    NodeList<VarDecl> vars = new NodeList<VarDecl>();
+    NodeList<Statement> statements = new NodeList<Statement>();
+    Expression returnExp;
+    VarDecl f;
+    VarDecl v;
+    Statement s;
+    Type formalType;
+    String formalName;
+    Token tprint;
+}
+{
+    <PUBLIC> returnType=Type()
+    (name=Identifier() | tprint=<PRINT> {name = tprint.image;})
+    <LPAREN> formals=FormalList()  { formalsAsNodeList = new NodeList<VarDecl>(formals);}<RPAREN> <LBRACE>
+       (LOOKAHEAD(2) t=Type() id=Identifier() <SEMICOLON>
+               {v = new VarDecl(ast.VarDecl.Kind.LOCAL,t,id,0); vars.add(v);})*
+               ( s=Statement() {statements.add(s);} )*
+        <RETURN> returnExp=Expression() <SEMICOLON> <RBRACE>
+    {return new MethodDecl(returnType,name,formalsAsNodeList,vars,statements,returnExp);}
+}
+
+FunctionDecl FunctionDeclaration() : {
+	Type rt;
+	String i;
+	List<VarDecl> formals;
+	List<Statement> stats = new ArrayList<Statement>();
+	Statement s;
+	Expression re;
+}
+{	rt=Type() i=Identifier() "(" formals=FormalList() ")" "{"
+	    (
+	    	s=Statement()					{ stats.add(s); }
+	    )*
+	    "return" re=Expression() ";"
+	 "}"
+	 { return new FunctionDecl(rt, i, formals, stats, re); }
+}
+
+List<VarDecl> FormalList() : {
+	List<VarDecl> formals = new ArrayList<VarDecl>();
+	Type t;
+	String n;
+}
+{	( t=Type() n=Identifier() 			{ formals.add(new VarDecl(ast.VarDecl.Kind.FORMAL,t,n, formals.size())); }
+		(
+			"," t=Type() n=Identifier()	{ formals.add(new VarDecl(ast.VarDecl.Kind.FORMAL,t,n, formals.size())); }
+		)*
+	)?
+	{ return formals; }
+}
+
+//Type	::=	"int" "[" "]"
+//|	"boolean"
+//|	"int"
+//|	Identifier
+Type Type() : {
+	Type t;
+	String name;
+}
+{
+(
+ LOOKAHEAD (2)
+ "int" "[" "]"          { t =new IntArrayType(); }
+|"int"					{ t = new IntegerType(); }
+| "boolean"				{ t = new BooleanType(); }
+| name=Identifier()     { t = new ObjectType(name);}
+)						{ return t; }
+}
+
+Statement Statement() : {
+	Statement s;
+
+}
+{
+s=Block()       {return s;}
+| s=If()        {return s;}
+| s=While()        {return s;}
+| s=Print()         {return s;}
+| s=Assign()	{ return s; }
+}
+
+// Block
+Block Block() : {
+	NodeList<Statement> statements = new NodeList<Statement>();
+	Statement s;
+}
+{
+<LBRACE> ( s=Statement() {statements.add(s);} )* <RBRACE> {return new Block(statements);}
+}
+// If
+If If() : {
+    Statement s;
+    Expression tst;
+    Statement thn;
+    Statement els;
+}
+{
+    <IF> <LPAREN> tst=Expression() <RPAREN> thn=Statement() <ELSE> els=Statement()
+    {return new If(tst,thn,els);}
+}
+// While
+While While() : {
+    Expression tst;
+    Statement body;
+}
+{
+   <WHILE> <LPAREN> tst=Expression() <RPAREN> body=Statement()
+   {return new While(tst,body);}
+}
+// Print
+Print Print() :{
+    Expression exp;
+}
+{
+    <SYSTEM> <DOT> <OUT> <DOT> <PRINTLN> <LPAREN> exp=Expression() <RPAREN> <SEMICOLON>
+    {return new Print(exp);}
+    | <PRINT> exp=Expression()
+    {return new Print(exp);}
+}
+
+Statement Assign() : {
+    String name;
+    Expression value,index,v2;
+    Statement s;
+}
+{   name=Identifier()
+    (<ASSIGN> value=Expression() <SEMICOLON>
+    {s=new Assign(new IdentifierExp(name), value); }
+
+   |<LBRACKET> index=Expression() <RBRACKET> <ASSIGN> v2=Expression() <SEMICOLON>
+    {s=new ArrayAssign(name,index,v2);})
+    {return s;}
+}
+
+
+
+// For parsing anything with priority same or higher than &&
+Expression Expression() : {
+    Expression e,e2;
+}
+{
+    e=CompExpression()
+    (<AND> e2=Expression()
+        {e=new And(e,e2);})*
+    {return e;}
+}
+
+// For parsing anything with priority same or higher than <
+Expression CompExpression() : {
+    Expression e, e2;
+}
+{   e=AddExpression()
+    ( <SMALLER> e2=AddExpression()
+        { e = new LessThan(e, e2); }
+    )?
+    { return e; }
+}
+// For parsing anything with priority same or higher than +
+Expression AddExpression() : {
+    Expression e, e2;
+    Token op;
+}
+{   e=MultExpression()
+    (   (op=<PLUS>|op=<MINUS>)
+        e2=MultExpression()
+            { if (op.image.equals("+"))
+                e=new Plus(e, e2);
+              else
+                e=new Minus(e, e2);
+            }
+    )*
+    { return e; }
+}
+
+// For parsing anything with priority same or higher than *
+Expression MultExpression() :  {
+    Expression e, e2;
+}
+{   e=NotExpression()
+    (   <MULT> e2=NotExpression()
+            { e = new Times(e, e2); }
+    )*
+    { return e; }
+}
+
+// For parsing anything with priority same or higher than ! expressions:
+Expression NotExpression() : {
+    Expression e;
+}
+{   <NOT> e=NotExpression()
+        { return new Not(e); }
+|   e=ArrayExpression()
+        { return e; }
+}
+
+// array and method call 
+Expression ArrayExpression() : {
+    String i;
+    Expression e,e2;
+    NodeList<Expression> el;
+}
+{   // Expression "[" Expression "]"
+    e=PrimaryExpression()
+        (<LBRACKET> e2=ArrayExpression() <RBRACKET>
+        {e=new ArrayLookup(e,e2);}
+        |   // Expression "." "length"
+        (<DOT>
+            (<LENGTH> {e=new ArrayLength(e);}
+            // Expression "." Identifier "(" ExpressionList ")"
+           |i=Identifier() <LPAREN> el=ExpressionList() <RPAREN>
+            {e=new Call(e, new IdentifierExp(i), el);})
+        ))*
+    {return e;}
+}
+
+/* PrimaryExpression is the expression that has highest precedence.*/
+Expression PrimaryExpression() : {
+    Token t;
+    String i;
+    Expression e;
+    NodeList<Expression> el;
+}
+{   t=<INTEGER_LITERAL>    { return new IntegerLiteral(t.image); }
+|   t=<TRUE>               { return new BooleanLiteral(true);}
+|   t=<FALSE>              { return new BooleanLiteral(false);}
+|   t=<THIS>               { return new This();}
+|   i=Identifier()         { return new IdentifierExp(i);}
+|   <LPAREN> e=Expression() <RPAREN>      { return e; }
+|   LOOKAHEAD(2) <NEW>
+       <INT> <LBRACKET> e=Expression() <RBRACKET>
+        {return new NewArray(e);}
+|   <NEW> i=Identifier() <LPAREN> <RPAREN>
+    {return new NewObject(i);}
+}
+
+
+NodeList<Expression> ExpressionList() : {
+	List<Expression> el = new ArrayList<Expression>();
+	Expression e;
+}
+{
+	(
+		e=Expression() 			{ el.add(e); }
+		(
+			<COMMA> e=Expression()	{ el.add(e); }
+		)*
+	)?
+	{ return new NodeList<Expression>(el); }
+}
+
+String Identifier() : {
+	Token i;
+}
+{
+	i = <IDENTIFIER>
+	{ return i.image; }
+}

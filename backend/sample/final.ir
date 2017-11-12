@@ -1,0 +1,251 @@
+MethodFragment {
+   X86_64Frame { label = O_m
+      nextLocalOffset = -8
+      formals = List {
+         t1909
+         t1910
+         t1911
+      }
+   }
+   List {
+      LABEL L_813
+      MOVE(
+         t1912 <-
+         %rbx:%rbx)
+      MOVE(
+         t1913 <-
+         %r12:%r12)
+      MOVE(
+         t1914 <-
+         %r13:%r13)
+      MOVE(
+         t1915 <-
+         %r14:%r14)
+      MOVE(
+         t1916 <-
+         %r15:%r15)
+      MOVE(
+         t1909 <-
+         %rdi:%rdi)
+      MOVE(
+         t1910 <-
+         %rsi:%rsi)
+      MOVE(
+         t1911 <-
+         %rdx:%rdx)
+      MOVE(
+         %rax:%rax <-
+         CONST 3)
+      LABEL bail_802
+      MOVE(
+         %rbx:%rbx <-
+         t1912)
+      MOVE(
+         %r12:%r12 <-
+         t1913)
+      MOVE(
+         %r13:%r13 <-
+         t1914)
+      MOVE(
+         %r14:%r14 <-
+         t1915)
+      MOVE(
+         %r15:%r15 <-
+         t1916)
+      LABEL DONE_814
+   }
+}
+MethodFragment {
+   X86_64Frame { label = Test_do
+      nextLocalOffset = -8
+      formals = List {
+         t1917
+      }
+   }
+   List {
+      LABEL L_815
+      MOVE(
+         t1923 <-
+         %rbx:%rbx)
+      MOVE(
+         t1924 <-
+         %r12:%r12)
+      MOVE(
+         t1925 <-
+         %r13:%r13)
+      MOVE(
+         t1926 <-
+         %r14:%r14)
+      MOVE(
+         t1927 <-
+         %r15:%r15)
+      MOVE(
+         t1917 <-
+         %rdi:%rdi)
+      MOVE(
+         t1920 <-
+         CONST 0)
+      MOVE(
+         t1918 <-
+         CALL(
+            NAME(cs411newarray),
+            CONST 4))
+      CJUMP(UGE,
+         CONST 3,
+         MEM(BINOP(PLUS,
+            t1918, 
+            CONST -8)),
+         boundsbad_805, boundsok_804)
+      LABEL boundsok_804
+      MOVE(
+         MEM(BINOP(PLUS,
+            t1918, 
+            CONST 24)) <-
+         CONST 11)
+      MOVE(
+         t1919 <-
+         CONST 1)
+      MOVE(
+         t1920 <-
+         CALL(
+            NAME(cs411newobject),
+            CONST 0))
+      MOVE(
+         t1922 <-
+         CONST 0)
+      CJUMP(UGE,
+         CONST 3,
+         MEM(BINOP(PLUS,
+            t1918, 
+            CONST -8)),
+         boundsbad_805, boundsok_806)
+      LABEL boundsok_806
+      MOVE(
+         t1934 <-
+         MEM(BINOP(PLUS,
+            t1918, 
+            CONST 24)))
+      MOVE(
+         t1921 <-
+         t1920)
+      CJUMP(EQ,
+         t1921,
+         CONST 0,
+         invokebad_808, invokeok_807)
+      LABEL invokeok_807
+      MOVE(
+         t1933 <-
+         CALL(
+            NAME(O_m),
+            t1921,
+            CONST 6,
+            CONST 1))
+      CJUMP(GE,
+         t1934,
+         t1933,
+         nomove_809, doright_811)
+      LABEL doright_811
+      CJUMP(EQ,
+         t1919,
+         CONST 0,
+         nomove_809, move_810)
+      LABEL move_810
+      MOVE(
+         t1922 <-
+         CONST 1)
+      LABEL nomove_809
+      MOVE(
+         t1919 <-
+         t1922)
+      MOVE(
+         %rax:%rax <-
+         CONST 2)
+      LABEL bail_803
+      MOVE(
+         %rbx:%rbx <-
+         t1923)
+      MOVE(
+         %r12:%r12 <-
+         t1924)
+      MOVE(
+         %r13:%r13 <-
+         t1925)
+      MOVE(
+         %r14:%r14 <-
+         t1926)
+      MOVE(
+         %r15:%r15 <-
+         t1927)
+      JUMP(NAME(DONE_816))
+      LABEL boundsbad_805
+      MOVE(
+         %rax:%rax <-
+         CALL(
+            NAME(cs411error),
+            CONST 1))
+      JUMP(NAME(bail_803))
+      LABEL invokebad_808
+      MOVE(
+         %rax:%rax <-
+         CALL(
+            NAME(cs411error),
+            CONST 2))
+      JUMP(NAME(bail_803))
+      LABEL DONE_816
+   }
+}
+MethodFragment {
+   X86_64Frame { label = cs411main
+      nextLocalOffset = -8
+      formals = List {
+      }
+   }
+   List {
+      LABEL L_817
+      MOVE(
+         t1928 <-
+         %rbx:%rbx)
+      MOVE(
+         t1929 <-
+         %r12:%r12)
+      MOVE(
+         t1930 <-
+         %r13:%r13)
+      MOVE(
+         t1931 <-
+         %r14:%r14)
+      MOVE(
+         t1932 <-
+         %r15:%r15)
+      MOVE(
+         t1936 <-
+         CALL(
+            NAME(cs411newobject),
+            CONST 0))
+      MOVE(
+         t1935 <-
+         CALL(
+            NAME(Test_do),
+            t1936))
+      EXP(CALL(
+         NAME(cs411println),
+         t1935))
+      LABEL bail_812
+      MOVE(
+         %rbx:%rbx <-
+         t1928)
+      MOVE(
+         %r12:%r12 <-
+         t1929)
+      MOVE(
+         %r13:%r13 <-
+         t1930)
+      MOVE(
+         %r14:%r14 <-
+         t1931)
+      MOVE(
+         %r15:%r15 <-
+         t1932)
+      LABEL DONE_818
+   }
+}
